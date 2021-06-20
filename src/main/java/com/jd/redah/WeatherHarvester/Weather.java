@@ -5,7 +5,7 @@ public class Weather {
   private String main;
   private String description;
   private String icon;
-  
+
   public Weather() {
   }
 
@@ -46,6 +46,4 @@ public class Weather {
     this.icon = icon;
   }
 
-  
-  
 }

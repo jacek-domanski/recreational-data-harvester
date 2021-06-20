@@ -3,67 +3,74 @@ package com.jd.redah.WeatherHarvester;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-@Configuration
-@EnableScheduling
+@Component
 public class WeatherHarvester {
+  public static void harvest() {
+    System.out.println("Performing request...");
 
-	// @Scheduled(cron = "0 0 1 * * * ", zone = "Europe/Warsaw")
-	@Scheduled(fixedDelay = 120000)
-	public static void harvest() {
-        RestTemplate restTemplate = new RestTemplateBuilder().build();
+    String lat = "50.061389";
+    String lon = "19.938333";
 
-	    System.out.println("Performing request...");
+    long dt = 
+      LocalDateTime.now()
+        .withHour(12)
+        .minusDays(1)
+        .atZone(ZoneId.of("UTC"))
+        .toEpochSecond();
 
-        String lat = "50.061389";
-        String lon = "19.938333";
-        String dt = "1623771931";
-        String weatherApiKey = readWeatherApiKey();
+    String weatherApiKey = readWeatherApiKey();
 
-        HistoricalWeather response = 
-            restTemplate.getForObject(
-                String.format(
-                    "https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=%s&lon=%s&dt=%s&appid=%s", 
-                    lat, lon, dt, weatherApiKey), 
-                HistoricalWeather.class);
-        
-	    System.out.println("Request performed!");
-        
-	    System.out.println(response);
-	}
+    RestTemplate restTemplate = new RestTemplateBuilder().build();
 
-    private static String readWeatherApiKey() {
-        try {
-            File apiKeyFile = new File("apiKey.txt");
-            Scanner scanner = new Scanner(apiKeyFile);
-            if (scanner.hasNext()) {
-                String apiKey = scanner.nextLine();
-                scanner.close();
-                return apiKey;
+    String requestUrl = "https://api.openweathermap.org/data/2.5/onecall/timemachine?";
+    String requestParams = 
+      "lat=" + lat + 
+      "&lon=" + lon + 
+      "&dt=" + dt + 
+      "&appid=" + weatherApiKey;
 
-            } else {
-                scanner.close();
-                throw new Exception();
-            }
+    HistoricalWeather response = 
+      restTemplate.getForObject(
+        requestUrl + requestParams,
+        HistoricalWeather.class);
 
-        } catch (FileNotFoundException e) {
-            System.out.println("Error while retrieving weather api key");
-            e.printStackTrace();
-            return new String();
+    System.out.println("Request performed!");
 
-        } catch (Exception e) {
-            System.out.println("Error while retrieving weather api key");
-            e.printStackTrace();
-            return new String();
-
-        }
-    }
-    
+    System.out.println(response);
 }
+
+  private static String readWeatherApiKey() {
+    try {
+      File apiKeyFile = new File("apiKey.txt");
+      Scanner scanner = new Scanner(apiKeyFile);
+      if (scanner.hasNext()) {
+        String apiKey = scanner.nextLine();
+        scanner.close();
+        return apiKey;
+
+      } else {
+        scanner.close();
+        throw new Exception();
+      }
+
+    } catch (FileNotFoundException e) {
+      System.out.println("Error while retrieving weather api key");
+      e.printStackTrace();
+      return new String();
+
+    } catch (Exception e) {
+      System.out.println("Error while retrieving weather api key");
+      e.printStackTrace();
+      return new String();
+
+      }
+  }
+
+  }
