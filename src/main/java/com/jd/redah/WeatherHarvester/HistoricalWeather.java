@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties
 public class HistoricalWeather {
+    private String name;
     private double lat;
     private double lon;
     private String timezone;
@@ -17,8 +19,16 @@ public class HistoricalWeather {
 
     @Override
     public String toString() {
-        return "HistoricalWeather [current=" + current + ", hourly=" + hourly + ", lat=" + lat + ", lon=" + lon
+        return "HistoricalWeather [name=" + name + ", current=" + current + ", hourly=" + hourly + ", lat=" + lat + ", lon=" + lon
                 + ", timezone=" + timezone + ", timezone_offset=" + timezone_offset + "]\n";
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
     }
 
     public double getLat() {
